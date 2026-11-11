@@ -46,10 +46,11 @@ class _ShinyDemoState extends State<ShinyDemo> {
                 onPressed: () {
                   setState(() {
                     count++;
+                    count++;
                   });
                 },
                 icon: const Icon(Icons.add),
-                label: const Text('カウント +1'),
+                label: const Text('カウント +2'),
               ),
               TextButton(
                 onPressed: () {
