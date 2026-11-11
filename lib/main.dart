@@ -32,7 +32,7 @@ class _ShinyDemoState extends State<ShinyDemo> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'GitHub Pagesで公開したFlutterアプリ',
+                'buttonClicker',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 20),
               ),
