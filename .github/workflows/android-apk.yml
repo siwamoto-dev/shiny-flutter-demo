@@ -40,9 +40,11 @@ jobs:
           flutter create --platforms=android --org org.example --project-name=session08_app app
           cp lib/main.dart app/lib/main.dart
 
+      # Flutter 3.50 deprecates the SDK-bundled Material import.
+      # Treat infos as non-fatal; warnings and errors remain fatal.
       - name: Analyze Flutter source
         working-directory: app
-        run: flutter analyze lib/main.dart
+        run: flutter analyze --no-fatal-infos lib/main.dart
 
       - name: Build debug APK for workshop
         working-directory: app
