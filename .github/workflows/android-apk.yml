@@ -1,0 +1,57 @@
+# Team Shiny / Flutter Seminar Session 08
+# Test-only APK; not for publishing on Google Play.
+name: Session 08 - Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/main.dart'
+      - '.github/workflows/android-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    name: Analyze and build APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v7
+
+      - name: Prepare Java for Android build
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepare Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Android project from Session 07 source
+        shell: bash
+        run: |
+          flutter create --platforms=android --org org.example --project-name=session08_app app
+          cp lib/main.dart app/lib/main.dart
+
+      - name: Analyze Flutter source
+        working-directory: app
+        run: flutter analyze lib/main.dart
+
+      - name: Build debug APK for workshop
+        working-directory: app
+        run: flutter build apk --debug
+
+      - name: Store APK for download
+        uses: actions/upload-artifact@v7
+        with:
+          name: session08-android-debug-apk
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
