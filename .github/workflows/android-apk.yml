@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-android:
@@ -57,3 +57,13 @@ jobs:
           path: app/build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
           retention-days: 7
+
+# ↓ 追加：GitHub Release を作成して APK を添付
+      - name: Publish APK to GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: session08-build-${{ github.run_number }}
+          name: "Session 08 Debug APK (Build #${{ github.run_number }})"
+          prerelease: true
+          generate_release_notes: true
+          files: app/build/app/outputs/flutter-apk/app-debug.apk
