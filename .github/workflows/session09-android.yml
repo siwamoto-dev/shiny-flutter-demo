@@ -1,0 +1,61 @@
+# Shiny-lab Flutter seminar Session 09
+# This adds a new workflow; do not delete Session 07/08 workflows.
+name: Session 09 - Persist Memo on Android
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/session09_main.dart'
+      - '.github/workflows/session09-android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    name: Analyze and build memo APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v7
+
+      - name: Prepare Java for Android build
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepare Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Create a separate Android app for Session 09
+        shell: bash
+        run: |
+          flutter --version
+          flutter create --platforms=android --org org.example --project-name=session09_memo app
+          cp lib/session09_main.dart app/lib/main.dart
+          cd app
+          flutter pub add 'shared_preferences:2.5.6'
+
+      # Info-level SDK deprecations remain visible; warnings/errors still fail.
+      - name: Analyze memo source
+        working-directory: app
+        run: flutter analyze --no-fatal-infos lib/main.dart
+
+      - name: Build debug APK
+        working-directory: app
+        run: flutter build apk --debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: session09-memo-android-debug-apk
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
