@@ -1,5 +1,6 @@
-# Shiny-lab Flutter seminar Session 09
-# This adds a new workflow; do not delete Session 07/08 workflows.
+
+# Team Shiny / Flutter Seminar Session 09
+# Test-only APK; not for publishing on Google Play.
 name: Session 09 - Persist Memo on Android
 
 on:
@@ -11,13 +12,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-android:
     name: Analyze and build memo APK
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v7
@@ -43,7 +45,6 @@ jobs:
           cd app
           flutter pub add 'shared_preferences:2.5.6'
 
-      # Info-level SDK deprecations remain visible; warnings/errors still fail.
       - name: Analyze memo source
         working-directory: app
         run: flutter analyze --no-fatal-infos lib/main.dart
@@ -59,3 +60,14 @@ jobs:
           path: app/build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
           retention-days: 7
+
+      - name: Publish APK to GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: session09-build-${{ github.run_number }}
+          name: "Session 09 Debug APK (Build #${{ github.run_number }})"
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: app/build/app/outputs/flutter-apk/app-debug.apk
